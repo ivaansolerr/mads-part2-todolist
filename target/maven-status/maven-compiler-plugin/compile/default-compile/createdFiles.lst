@@ -6,6 +6,7 @@ madstodolist/dto/TareaData.class
 madstodolist/Application.class
 madstodolist/controller/exception/TareaNotFoundException.class
 madstodolist/service/TareaServiceException.class
+madstodolist/controller/HomeController.class
 madstodolist/service/InitDbService.class
 madstodolist/dto/LoginData.class
 madstodolist/controller/exception/UsuarioNoLogeadoException.class
