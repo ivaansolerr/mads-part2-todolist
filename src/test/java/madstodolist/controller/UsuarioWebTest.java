@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -31,6 +32,9 @@ public class UsuarioWebTest {
     // las peticiones a los endpoint.
     @MockBean
     private UsuarioService usuarioService;
+
+    @MockBean
+    private madstodolist.authentication.ManagerUserSession managerUserSession;
 
     @Test
     public void servicioLoginUsuarioOK() throws Exception {
@@ -92,5 +96,41 @@ public class UsuarioWebTest {
                         .param("eMail","ana.garcia@gmail.com")
                         .param("password","000"))
                 .andExpect(content().string(containsString("Contraseña incorrecta")));
+    }
+
+    @Test
+    public void getRegistradosSinLoginLanzaExcepcion() throws Exception {
+        when(managerUserSession.usuarioLogeado()).thenReturn(null);
+
+        this.mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/registrados"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void getRegistradosConLoginMuestraListaUsuarios() throws Exception {
+        Long idLogeado = 1L;
+        when(managerUserSession.usuarioLogeado()).thenReturn(idLogeado);
+
+        UsuarioData usuarioLogeado = new UsuarioData();
+        usuarioLogeado.setId(idLogeado);
+        usuarioLogeado.setNombre("Ana García");
+        usuarioLogeado.setEmail("ana@ua");
+
+        UsuarioData usuario2 = new UsuarioData();
+        usuario2.setId(2L);
+        usuario2.setEmail("pedro@ua");
+
+        java.util.List<UsuarioData> listaUsuarios = java.util.Arrays.asList(usuarioLogeado, usuario2);
+
+        when(usuarioService.findById(idLogeado)).thenReturn(usuarioLogeado);
+        when(usuarioService.allUsuarios()).thenReturn(listaUsuarios);
+
+        this.mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/registrados"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(
+                        containsString("Listado de usuarios registrados"),
+                        containsString("ana@ua"),
+                        containsString("pedro@ua")
+                )));
     }
 }
