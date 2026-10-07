@@ -1,6 +1,8 @@
 package madstodolist.controller;
 
 import madstodolist.authentication.ManagerUserSession;
+import madstodolist.controller.exception.UsuarioNoAutorizadoException;
+import madstodolist.controller.exception.UsuarioNotFoundException;
 import madstodolist.dto.LoginData;
 import madstodolist.dto.RegistroData;
 import madstodolist.dto.UsuarioData;
@@ -26,6 +28,18 @@ public class LoginController {
 
     @Autowired
     ManagerUserSession managerUserSession;
+
+    private UsuarioData comprobarAdmin() {
+        Long idUsuarioLogeado = managerUserSession.usuarioLogeado();
+        if (idUsuarioLogeado == null) {
+            throw new UsuarioNoAutorizadoException();
+        }
+        UsuarioData usuario = usuarioService.findById(idUsuarioLogeado);
+        if (usuario == null || usuario.getAdmin() == null || !usuario.getAdmin()) {
+            throw new UsuarioNoAutorizadoException();
+        }
+        return usuario;
+    }
 
     @GetMapping("/")
     public String home(Model model) {
@@ -106,13 +120,9 @@ public class LoginController {
 
     @GetMapping("/registrados")
     public String listadoUsuariosRegistrados(Model model) {
-        Long idUsuarioLogeado = managerUserSession.usuarioLogeado();
-        if (idUsuarioLogeado == null) {
-            throw new madstodolist.controller.exception.UsuarioNoLogeadoException();
-        }
+        UsuarioData usuarioAdmin = comprobarAdmin();
 
-        UsuarioData usuarioLogeado = usuarioService.findById(idUsuarioLogeado);
-        model.addAttribute("usuario", usuarioLogeado);
+        model.addAttribute("usuario", usuarioAdmin);
 
         List<UsuarioData> usuarios = usuarioService.allUsuarios();
         model.addAttribute("usuarios", usuarios);
@@ -122,20 +132,14 @@ public class LoginController {
 
     @GetMapping("/registrados/{id}")
     public String descripcionUsuario(@PathVariable(value = "id") Long id, Model model) {
-        Long idUsuarioLogeado = managerUserSession.usuarioLogeado();
-        if (idUsuarioLogeado == null) {
-            throw new madstodolist.controller.exception.UsuarioNoLogeadoException();
-        }
+        UsuarioData usuarioAdmin = comprobarAdmin();
 
         UsuarioData usuarioConsultado = usuarioService.findById(id);
         if (usuarioConsultado == null) {
-            throw new org.springframework.web.server.ResponseStatusException(
-                    org.springframework.http.HttpStatus.NOT_FOUND, "Usuario no encontrado"
-            );
+            throw new UsuarioNotFoundException();
         }
 
-        UsuarioData usuarioLogeado = usuarioService.findById(idUsuarioLogeado);
-        model.addAttribute("usuario", usuarioLogeado);
+        model.addAttribute("usuario", usuarioAdmin);
         model.addAttribute("usuarioConsultado", usuarioConsultado);
 
         return "descripcionUsuario";

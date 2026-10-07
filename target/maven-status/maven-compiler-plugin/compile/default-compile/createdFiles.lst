@@ -1,9 +1,11 @@
 madstodolist/service/UsuarioServiceException.class
 madstodolist/authentication/ManagerUserSession.class
+madstodolist/controller/exception/UsuarioNoAutorizadoException.class
 madstodolist/dto/RegistroData.class
 madstodolist/model/Tarea.class
 madstodolist/dto/TareaData.class
 madstodolist/Application.class
+madstodolist/controller/exception/UsuarioNotFoundException.class
 madstodolist/controller/exception/TareaNotFoundException.class
 madstodolist/service/TareaServiceException.class
 madstodolist/controller/HomeController.class

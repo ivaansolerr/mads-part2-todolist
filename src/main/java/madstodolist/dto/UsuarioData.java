@@ -76,4 +76,9 @@ public class UsuarioData {
     public void setAdmin(Boolean admin) {
         this.admin = admin;
     }
+
+    public Boolean isAdmin() {
+        return admin != null && admin;
+    }
+
 }

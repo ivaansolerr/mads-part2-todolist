@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
@@ -107,61 +108,9 @@ public class UsuarioWebTest {
                 .andExpect(status().is4xxClientError());
     }
 
-    @Test
-    public void getRegistradosConLoginMuestraListaUsuarios() throws Exception {
-        Long idLogeado = 1L;
-        when(managerUserSession.usuarioLogeado()).thenReturn(idLogeado);
 
-        UsuarioData usuarioLogeado = new UsuarioData();
-        usuarioLogeado.setId(idLogeado);
-        usuarioLogeado.setNombre("Ana García");
-        usuarioLogeado.setEmail("ana@ua");
 
-        UsuarioData usuario2 = new UsuarioData();
-        usuario2.setId(2L);
-        usuario2.setEmail("pedro@ua");
-
-        java.util.List<UsuarioData> listaUsuarios = java.util.Arrays.asList(usuarioLogeado, usuario2);
-
-        when(usuarioService.findById(idLogeado)).thenReturn(usuarioLogeado);
-        when(usuarioService.allUsuarios()).thenReturn(listaUsuarios);
-
-        this.mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/registrados"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(allOf(
-                        containsString("Listado de usuarios registrados"),
-                        containsString("ana@ua"),
-                        containsString("pedro@ua")
-                )));
-    }
-
-    @Test
-    public void getDescripcionUsuarioMuestraDatosSinPassword() throws Exception {
-        Long idLogeado = 1L;
-        when(managerUserSession.usuarioLogeado()).thenReturn(idLogeado);
-
-        UsuarioData usuarioLogeado = new UsuarioData();
-        usuarioLogeado.setId(idLogeado);
-        usuarioLogeado.setNombre("Ana García");
-        usuarioLogeado.setEmail("ana@ua");
-
-        UsuarioData usuarioDetalle = new UsuarioData();
-        usuarioDetalle.setId(2L);
-        usuarioDetalle.setNombre("Carlos Ruiz");
-        usuarioDetalle.setEmail("carlos@ua");
-        usuarioDetalle.setPassword("secreto123");
-
-        when(usuarioService.findById(idLogeado)).thenReturn(usuarioLogeado);
-        when(usuarioService.findById(2L)).thenReturn(usuarioDetalle);
-
-        this.mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/registrados/2"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(allOf(
-                        containsString("Carlos Ruiz"),
-                        containsString("carlos@ua"),
-                        not(containsString("secreto123"))
-                )));
-    }
+    
 
     @Test
     public void loginAdminRedirigeARegistrados() throws Exception {
@@ -178,5 +127,108 @@ public class UsuarioWebTest {
                         .param("password", "123"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/registrados"));
+    }
+
+    // tests para comprobar que solo admin vea la lista de usuarios
+
+    @Test
+    public void getRegistradosSinLoginDevuelveNoAutorizado() throws Exception {
+        when(managerUserSession.usuarioLogeado()).thenReturn(null);
+
+        this.mockMvc.perform(get("/registrados"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void getRegistradosUsuarioNoAdminDevuelveNoAutorizado() throws Exception {
+        Long idNoAdmin = 2L;
+        UsuarioData noAdmin = new UsuarioData();
+        noAdmin.setId(idNoAdmin);
+        noAdmin.setEmail("noadmin@ua");
+        noAdmin.setAdmin(false);
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(idNoAdmin);
+        when(usuarioService.findById(idNoAdmin)).thenReturn(noAdmin);
+
+        this.mockMvc.perform(get("/registrados"))
+                .andExpect(status().isUnauthorized());
+    }
+
+
+
+    @Test
+    public void getDescripcionUsuarioNoAdminDevuelveNoAutorizado() throws Exception {
+        Long idNoAdmin = 2L;
+        UsuarioData noAdmin = new UsuarioData();
+        noAdmin.setId(idNoAdmin);
+        noAdmin.setEmail("noadmin@ua");
+        noAdmin.setAdmin(false);
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(idNoAdmin);
+        when(usuarioService.findById(idNoAdmin)).thenReturn(noAdmin);
+
+        this.mockMvc.perform(get("/registrados/3"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void getRegistradosConAdminMuestraListaUsuarios() throws Exception {
+        Long idAdmin = 1L;
+        when(managerUserSession.usuarioLogeado()).thenReturn(idAdmin);
+
+        UsuarioData admin = new UsuarioData();
+        admin.setId(idAdmin);
+        admin.setNombre("Admin");
+        admin.setEmail("admin@ua");
+        admin.setAdmin(true);
+
+        UsuarioData usuario2 = new UsuarioData();
+        usuario2.setId(2L);
+        usuario2.setEmail("pedro@ua");
+
+        java.util.List<UsuarioData> listaUsuarios = java.util.Arrays.asList(admin, usuario2);
+
+        // Simulamos la llamada de comprobarAdmin() y la de allUsuarios()
+        when(usuarioService.findById(idAdmin)).thenReturn(admin);
+        when(usuarioService.allUsuarios()).thenReturn(listaUsuarios);
+
+        this.mockMvc.perform(get("/registrados"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(
+                        containsString("Listado de usuarios registrados"),
+                        containsString("admin@ua"),
+                        containsString("pedro@ua")
+                )));
+    }
+
+    @Test
+    public void getDescripcionUsuarioConAdminMuestraDatosSinPassword() throws Exception {
+        Long idAdmin = 1L;
+        when(managerUserSession.usuarioLogeado()).thenReturn(idAdmin);
+
+        UsuarioData admin = new UsuarioData();
+        admin.setId(idAdmin);
+        admin.setNombre("Admin");
+        admin.setEmail("admin@ua");
+        admin.setAdmin(true);
+
+        UsuarioData usuarioDetalle = new UsuarioData();
+        usuarioDetalle.setId(2L);
+        usuarioDetalle.setNombre("Carlos Ruiz");
+        usuarioDetalle.setEmail("carlos@ua");
+        usuarioDetalle.setPassword("secreto123");
+
+        // comprobarAdmin() buscará el id 1L
+        when(usuarioService.findById(idAdmin)).thenReturn(admin);
+        // La consulta de la ruta /registrados/2 buscará el id 2L
+        when(usuarioService.findById(2L)).thenReturn(usuarioDetalle);
+
+        this.mockMvc.perform(get("/registrados/2"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(
+                        containsString("Carlos Ruiz"),
+                        containsString("carlos@ua"),
+                        not(containsString("secreto123"))
+                )));
     }
 }
