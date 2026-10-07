@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
@@ -131,6 +132,34 @@ public class UsuarioWebTest {
                         containsString("Listado de usuarios registrados"),
                         containsString("ana@ua"),
                         containsString("pedro@ua")
+                )));
+    }
+
+    @Test
+    public void getDescripcionUsuarioMuestraDatosSinPassword() throws Exception {
+        Long idLogeado = 1L;
+        when(managerUserSession.usuarioLogeado()).thenReturn(idLogeado);
+
+        UsuarioData usuarioLogeado = new UsuarioData();
+        usuarioLogeado.setId(idLogeado);
+        usuarioLogeado.setNombre("Ana García");
+        usuarioLogeado.setEmail("ana@ua");
+
+        UsuarioData usuarioDetalle = new UsuarioData();
+        usuarioDetalle.setId(2L);
+        usuarioDetalle.setNombre("Carlos Ruiz");
+        usuarioDetalle.setEmail("carlos@ua");
+        usuarioDetalle.setPassword("secreto123");
+
+        when(usuarioService.findById(idLogeado)).thenReturn(usuarioLogeado);
+        when(usuarioService.findById(2L)).thenReturn(usuarioDetalle);
+
+        this.mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/registrados/2"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(
+                        containsString("Carlos Ruiz"),
+                        containsString("carlos@ua"),
+                        not(containsString("secreto123"))
                 )));
     }
 }

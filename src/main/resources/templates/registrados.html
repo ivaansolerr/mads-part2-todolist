@@ -21,12 +21,16 @@
         <tr>
           <th>Identificador</th>
           <th>Correo electrónico</th>
+          <th>Acción</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="u: ${usuarios}">
           <td th:text="${u.id}"></td>
           <td th:text="${u.email}"></td>
+          <td>
+            <a class="btn btn-primary btn-xs" th:href="@{'/registrados/' + ${u.id}}">Ver detalles</a>
+          </td>
         </tr>
         </tbody>
       </table>
