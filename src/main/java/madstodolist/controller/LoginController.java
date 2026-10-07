@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 public class LoginController {
@@ -92,4 +93,20 @@ public class LoginController {
         managerUserSession.logout();
         return "redirect:/login";
    }
+
+    @GetMapping("/registrados")
+    public String listadoUsuariosRegistrados(Model model) {
+        Long idUsuarioLogeado = managerUserSession.usuarioLogeado();
+        if (idUsuarioLogeado == null) {
+            throw new madstodolist.controller.exception.UsuarioNoLogeadoException();
+        }
+
+        UsuarioData usuarioLogeado = usuarioService.findById(idUsuarioLogeado);
+        model.addAttribute("usuario", usuarioLogeado);
+
+        List<UsuarioData> usuarios = usuarioService.allUsuarios();
+        model.addAttribute("usuarios", usuarios);
+
+        return "registrados";
+    }
 }
