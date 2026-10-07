@@ -162,4 +162,21 @@ public class UsuarioWebTest {
                         not(containsString("secreto123"))
                 )));
     }
+
+    @Test
+    public void loginAdminRedirigeARegistrados() throws Exception {
+        UsuarioData admin = new UsuarioData();
+        admin.setId(1L);
+        admin.setEmail("admin@ua");
+        admin.setAdmin(true);
+
+        when(usuarioService.login("admin@ua", "123")).thenReturn(UsuarioService.LoginStatus.LOGIN_OK);
+        when(usuarioService.findByEmail("admin@ua")).thenReturn(admin);
+
+        this.mockMvc.perform(post("/login")
+                        .param("eMail", "admin@ua")
+                        .param("password", "123"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/registrados"));
+    }
 }

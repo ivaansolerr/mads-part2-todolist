@@ -7,6 +7,8 @@
 
 <div th:replace="fragments :: navbar"></div>
 
+<div th:replace="fragments :: navbar"></div>
+
 <div class="container-fluid">
 
     <div class="row justify-content-center mb-3">
@@ -40,6 +42,12 @@
                             <label for="fechaNacimiento">Fecha de nacimiento</label>
                             <input id="fechaNacimiento" class="form-control" name="fechaNacimiento"
                                    placeholder="01-12-2019" th:field="*{fechaNacimiento}"/>
+                        </div>
+
+                        <!-- Checkbox para darse de alta como administrador -->
+                        <div class="form-group form-check" th:if="${mostrarAdmin}">
+                            <input type="checkbox" class="form-check-input" id="admin" th:field="*{admin}">
+                            <label class="form-check-label" for="admin">Darse de alta como administrador</label>
                         </div>
 
                         <button type="submit" class="btn btn-primary">Registro</button>

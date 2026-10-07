@@ -169,4 +169,22 @@ public class UsuarioServiceTest {
         assertThat(usuarios).extracting(UsuarioData::getEmail)
                 .containsExactlyInAnyOrder("user@ua", "segundo@ua");
     }
+
+    @Test
+    public void registrarSegundoAdminLanzaExcepcion() {
+        UsuarioData admin1 = new UsuarioData();
+        admin1.setEmail("admin1@ua");
+        admin1.setPassword("123");
+        admin1.setAdmin(true);
+        usuarioService.registrar(admin1);
+
+        UsuarioData admin2 = new UsuarioData();
+        admin2.setEmail("admin2@ua");
+        admin2.setPassword("123");
+        admin2.setAdmin(true);
+
+        org.junit.jupiter.api.Assertions.assertThrows(UsuarioServiceException.class, () -> {
+            usuarioService.registrar(admin2);
+        });
+    }
 }
