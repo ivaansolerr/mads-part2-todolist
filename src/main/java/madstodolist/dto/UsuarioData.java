@@ -13,7 +13,15 @@ public class UsuarioData {
     private Date fechaNacimiento;
     private Boolean admin = false;
 
+    private Boolean bloqueado = false;
 
+    public Boolean getBloqueado() {
+        return bloqueado;
+    }
+
+    public void setBloqueado(Boolean bloqueado) {
+        this.bloqueado = bloqueado;
+    }
 
     // Getters y setters
 

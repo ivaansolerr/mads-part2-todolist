@@ -21,7 +21,8 @@
         <tr>
           <th>Identificador</th>
           <th>Correo electrónico</th>
-          <th>Acción</th>
+          <th>Estado</th>
+          <th>Acciones</th>
         </tr>
         </thead>
         <tbody>
@@ -29,7 +30,23 @@
           <td th:text="${u.id}"></td>
           <td th:text="${u.email}"></td>
           <td>
-            <a class="btn btn-primary btn-xs" th:href="@{'/registrados/' + ${u.id}}">Ver detalles</a>
+            <span th:if="${u.bloqueado != null && u.bloqueado}" class="badge badge-danger">Bloqueado</span>
+            <span th:unless="${u.bloqueado != null && u.bloqueado}" class="badge badge-success">Activo</span>
+          </td>
+          <td>
+            <a class="btn btn-primary btn-sm" th:href="@{'/registrados/' + ${u.id}}">Ver detalles</a>
+
+            <!-- Bloquear / Desbloquear (oculto para el propio admin logeado) -->
+            <span th:if="${u.id != usuario.id}">
+                            <form th:if="${u.bloqueado == null || !u.bloqueado}"
+                                  th:action="@{'/registrados/' + ${u.id} + '/bloquear'}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-warning btn-sm">Bloquear</button>
+                            </form>
+                            <form th:if="${u.bloqueado != null && u.bloqueado}"
+                                  th:action="@{'/registrados/' + ${u.id} + '/desbloquear'}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-success btn-sm">Habilitar</button>
+                            </form>
+                        </span>
           </td>
         </tr>
         </tbody>

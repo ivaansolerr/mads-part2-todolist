@@ -27,7 +27,15 @@ public class Usuario implements Serializable {
 
     private Boolean admin = false;
 
+    private Boolean bloqueado = false;
 
+    public Boolean getBloqueado() {
+        return bloqueado;
+    }
+
+    public void setBloqueado(Boolean bloqueado) {
+        this.bloqueado = bloqueado;
+    }
 
     // La relación es lazy por defecto,
     // es necesario acceder a la lista de tareas para que se carguen

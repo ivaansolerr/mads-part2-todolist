@@ -19,7 +19,7 @@ public class UsuarioService {
 
     Logger logger = LoggerFactory.getLogger(UsuarioService.class);
 
-    public enum LoginStatus {LOGIN_OK, USER_NOT_FOUND, ERROR_PASSWORD}
+    public enum LoginStatus {LOGIN_OK, USER_NOT_FOUND, ERROR_PASSWORD, USER_BLOCKED}
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -33,14 +33,13 @@ public class UsuarioService {
             return LoginStatus.USER_NOT_FOUND;
         } else if (!usuario.get().getPassword().equals(password)) {
             return LoginStatus.ERROR_PASSWORD;
+        } else if (usuario.get().getBloqueado() != null && usuario.get().getBloqueado()) {
+            return LoginStatus.USER_BLOCKED;
         } else {
             return LoginStatus.LOGIN_OK;
         }
     }
 
-    // Se añade un usuario en la aplicación.
-    // El email y password del usuario deben ser distinto de null
-    // El email no debe estar registrado en la base de datos
     @Transactional
     public UsuarioData registrar(UsuarioData usuario) {
         Optional<Usuario> usuarioBD = usuarioRepository.findByEmail(usuario.getEmail());
@@ -57,6 +56,9 @@ public class UsuarioService {
             throw new UsuarioServiceException("El usuario no tiene password");
         else {
             Usuario usuarioNuevo = modelMapper.map(usuario, Usuario.class);
+            if (usuarioNuevo.getBloqueado() == null) {
+                usuarioNuevo.setBloqueado(false);
+            }
             usuarioNuevo = usuarioRepository.save(usuarioNuevo);
             return modelMapper.map(usuarioNuevo, UsuarioData.class);
         }
@@ -93,5 +95,15 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public boolean existeAdmin() {
         return usuarioRepository.existsByAdminTrue();
+    }
+
+    @Transactional
+    public void cambiarEstadoBloqueo(Long usuarioId, boolean bloqueado) {
+        Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
+        if (usuario == null) {
+            throw new UsuarioServiceException("Usuario no encontrado");
+        }
+        usuario.setBloqueado(bloqueado);
+        usuarioRepository.save(usuario);
     }
 }

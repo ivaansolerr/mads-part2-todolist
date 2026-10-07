@@ -8,6 +8,7 @@
 /home/ivans/Desktop/mads/mads-part2/src/main/java/madstodolist/authentication/ManagerUserSession.java
 /home/ivans/Desktop/mads/mads-part2/src/main/java/madstodolist/dto/UsuarioData.java
 /home/ivans/Desktop/mads/mads-part2/src/main/java/madstodolist/model/Tarea.java
+/home/ivans/Desktop/mads/mads-part2/src/main/java/madstodolist/controller/UsuarioController.java
 /home/ivans/Desktop/mads/mads-part2/src/main/java/madstodolist/repository/TareaRepository.java
 /home/ivans/Desktop/mads/mads-part2/src/main/java/madstodolist/controller/exception/UsuarioNotFoundException.java
 /home/ivans/Desktop/mads/mads-part2/src/main/java/madstodolist/controller/exception/UsuarioNoLogeadoException.java

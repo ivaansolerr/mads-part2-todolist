@@ -231,4 +231,31 @@ public class UsuarioWebTest {
                         not(containsString("secreto123"))
                 )));
     }
+
+    @Test
+    public void loginUsuarioBloqueadoMuestraError() throws Exception {
+        when(usuarioService.login("bloqueado@ua", "123"))
+                .thenReturn(UsuarioService.LoginStatus.USER_BLOCKED);
+
+        this.mockMvc.perform(post("/login")
+                        .param("eMail", "bloqueado@ua")
+                        .param("password", "123"))
+                .andExpect(content().string(containsString("El usuario tiene bloqueado el acceso")));
+    }
+
+    @Test
+    public void postBloquearUsuarioRedirigeARegistrados() throws Exception {
+        Long idAdmin = 1L;
+        when(managerUserSession.usuarioLogeado()).thenReturn(idAdmin);
+
+        UsuarioData admin = new UsuarioData();
+        admin.setId(idAdmin);
+        admin.setAdmin(true);
+
+        when(usuarioService.findById(idAdmin)).thenReturn(admin);
+
+        this.mockMvc.perform(post("/registrados/2/bloquear"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/registrados"));
+    }
 }

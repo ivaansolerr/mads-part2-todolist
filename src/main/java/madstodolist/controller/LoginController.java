@@ -1,8 +1,6 @@
 package madstodolist.controller;
 
 import madstodolist.authentication.ManagerUserSession;
-import madstodolist.controller.exception.UsuarioNoAutorizadoException;
-import madstodolist.controller.exception.UsuarioNotFoundException;
 import madstodolist.dto.LoginData;
 import madstodolist.dto.RegistroData;
 import madstodolist.dto.UsuarioData;
@@ -13,12 +11,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.List;
 
 @Controller
 public class LoginController {
@@ -28,18 +24,6 @@ public class LoginController {
 
     @Autowired
     ManagerUserSession managerUserSession;
-
-    private UsuarioData comprobarAdmin() {
-        Long idUsuarioLogeado = managerUserSession.usuarioLogeado();
-        if (idUsuarioLogeado == null) {
-            throw new UsuarioNoAutorizadoException();
-        }
-        UsuarioData usuario = usuarioService.findById(idUsuarioLogeado);
-        if (usuario == null || usuario.getAdmin() == null || !usuario.getAdmin()) {
-            throw new UsuarioNoAutorizadoException();
-        }
-        return usuario;
-    }
 
     @GetMapping("/")
     public String home(Model model) {
@@ -55,7 +39,6 @@ public class LoginController {
     @PostMapping("/login")
     public String loginSubmit(@ModelAttribute LoginData loginData, Model model, HttpSession session) {
 
-        // Llamada al servicio para comprobar si el login es correcto
         UsuarioService.LoginStatus loginStatus = usuarioService.login(loginData.geteMail(), loginData.getPassword());
 
         if (loginStatus == UsuarioService.LoginStatus.LOGIN_OK) {
@@ -74,6 +57,9 @@ public class LoginController {
             return "formLogin";
         } else if (loginStatus == UsuarioService.LoginStatus.ERROR_PASSWORD) {
             model.addAttribute("error", "Contraseña incorrecta");
+            return "formLogin";
+        } else if (loginStatus == UsuarioService.LoginStatus.USER_BLOCKED) {
+            model.addAttribute("error", "El usuario tiene bloqueado el acceso");
             return "formLogin";
         }
         return "formLogin";
@@ -116,32 +102,5 @@ public class LoginController {
     public String logout(HttpSession session) {
         managerUserSession.logout();
         return "redirect:/login";
-    }
-
-    @GetMapping("/registrados")
-    public String listadoUsuariosRegistrados(Model model) {
-        UsuarioData usuarioAdmin = comprobarAdmin();
-
-        model.addAttribute("usuario", usuarioAdmin);
-
-        List<UsuarioData> usuarios = usuarioService.allUsuarios();
-        model.addAttribute("usuarios", usuarios);
-
-        return "registrados";
-    }
-
-    @GetMapping("/registrados/{id}")
-    public String descripcionUsuario(@PathVariable(value = "id") Long id, Model model) {
-        UsuarioData usuarioAdmin = comprobarAdmin();
-
-        UsuarioData usuarioConsultado = usuarioService.findById(id);
-        if (usuarioConsultado == null) {
-            throw new UsuarioNotFoundException();
-        }
-
-        model.addAttribute("usuario", usuarioAdmin);
-        model.addAttribute("usuarioConsultado", usuarioConsultado);
-
-        return "descripcionUsuario";
     }
 }

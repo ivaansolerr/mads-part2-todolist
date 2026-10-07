@@ -187,4 +187,22 @@ public class UsuarioServiceTest {
             usuarioService.registrar(admin2);
         });
     }
+
+    @Test
+    public void usuarioBloqueadoNoPuedeHacerLogin() {
+        // GIVEN: Usuario registrado en la base de datos
+        Long id = addUsuarioBD();
+
+        // WHEN: Se bloquea el usuario
+        usuarioService.cambiarEstadoBloqueo(id, true);
+
+        // THEN: Intentar hacer login devuelve USER_BLOCKED
+        UsuarioService.LoginStatus status = usuarioService.login("user@ua", "123");
+        assertThat(status).isEqualTo(UsuarioService.LoginStatus.USER_BLOCKED);
+
+        // Si se vuelve a habilitar, el login vuelve a ser LOGIN_OK
+        usuarioService.cambiarEstadoBloqueo(id, false);
+        status = usuarioService.login("user@ua", "123");
+        assertThat(status).isEqualTo(UsuarioService.LoginStatus.LOGIN_OK);
+    }
 }
