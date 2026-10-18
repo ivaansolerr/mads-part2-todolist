@@ -254,7 +254,7 @@ public class UsuarioWebTest {
 
         when(usuarioService.findById(idAdmin)).thenReturn(admin);
 
-        this.mockMvc.perform(post("/regis4trados/2/bloquear"))
+        this.mockMvc.perform(post("/registrados/2/bloquear"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/registrados"));
     }
