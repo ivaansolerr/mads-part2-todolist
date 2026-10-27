@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Launch tests with Maven
-        run:  ./mvnw test -D spring.profiles.active=postgres
+        run:  ./mvnw test -Dspring.profiles.active=postgres
         env:
           POSTGRES_HOST: postgres
 
