@@ -1,6 +1,0 @@
-#surefire_0
-#Tue Oct 27 22:28:57 CET 2026
-basedir=/home/ivans/Desktop/mads/mads-part2
-user.dir=/home/ivans/Desktop/mads/mads-part2
-spring.profiles.active=postgres
-localRepository=/home/ivans/.m2/repository
