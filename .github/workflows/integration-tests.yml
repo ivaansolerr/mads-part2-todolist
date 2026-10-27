@@ -22,8 +22,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Launch tests with Maven
-        run:  ./mvnw test -Dspring.profiles.active=postgres
-        env:
-          POSTGRES_HOST: postgres
-
-          
+        run: ./mvnw test -Dspring.profiles.active=postgres -Dspring.datasource.url=jdbc:postgresql://postgres:5432/mads_test -Dspring.datasource.username=mads -Dspring.datasource.password=mads
