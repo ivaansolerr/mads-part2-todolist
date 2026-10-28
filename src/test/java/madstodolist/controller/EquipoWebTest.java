@@ -9,6 +9,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.List;
@@ -78,5 +82,44 @@ public class EquipoWebTest {
         // WHEN, THEN
         this.mockMvc.perform(get("/equipos/999"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getFormNuevoEquipoDevuelveVista() throws Exception {
+        this.mockMvc.perform(get("/equipos/nuevo"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Nuevo equipo")));
+    }
+
+    @Test
+    public void postNuevoEquipoCreaEquipoYRedirige() throws Exception {
+        Equipo equipo = new Equipo("Proyecto Nuevo");
+        equipo.setId(10L);
+        when(equipoService.crearEquipo("Proyecto Nuevo")).thenReturn(equipo);
+
+        this.mockMvc.perform(post("/equipos/nuevo")
+                        .param("nombre", "Proyecto Nuevo"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/equipos"));
+
+        verify(equipoService).crearEquipo("Proyecto Nuevo");
+    }
+
+    @Test
+    public void postAnadirUsuarioAEquipoRedirigeADetalle() throws Exception {
+        this.mockMvc.perform(post("/equipos/1/usuarios/2"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/equipos/1"));
+
+        verify(equipoService).anadirUsuarioAEquipo(1L, 2L);
+    }
+
+    @Test
+    public void deleteEliminarUsuarioDeEquipoRedirigeADetalle() throws Exception {
+        this.mockMvc.perform(delete("/equipos/1/usuarios/2"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/equipos/1"));
+
+        verify(equipoService).eliminarUsuarioDeEquipo(1L, 2L);
     }
 }

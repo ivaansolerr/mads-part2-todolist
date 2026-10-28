@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -40,5 +43,30 @@ public class EquipoController {
         model.addAttribute("equipo", equipo);
         model.addAttribute("usuarios", usuarios);
         return "detalleEquipo";
+    }
+
+    @GetMapping("/equipos/nuevo")
+    public String formNuevoEquipo() {
+        return "formNuevoEquipo";
+    }
+
+    @PostMapping("/equipos/nuevo")
+    public String crearEquipo(@RequestParam("nombre") String nombre) {
+        equipoService.crearEquipo(nombre);
+        return "redirect:/equipos";
+    }
+
+    @PostMapping("/equipos/{idEquipo}/usuarios/{idUsuario}")
+    public String anadirUsuarioAEquipo(@PathVariable(value = "idEquipo") Long idEquipo,
+                                       @PathVariable(value = "idUsuario") Long idUsuario) {
+        equipoService.anadirUsuarioAEquipo(idEquipo, idUsuario);
+        return "redirect:/equipos/" + idEquipo;
+    }
+
+    @DeleteMapping("/equipos/{idEquipo}/usuarios/{idUsuario}")
+    public String eliminarUsuarioDeEquipo(@PathVariable(value = "idEquipo") Long idEquipo,
+                                          @PathVariable(value = "idUsuario") Long idUsuario) {
+        equipoService.eliminarUsuarioDeEquipo(idEquipo, idUsuario);
+        return "redirect:/equipos/" + idEquipo;
     }
 }
