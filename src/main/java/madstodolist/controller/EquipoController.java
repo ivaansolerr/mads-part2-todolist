@@ -1,23 +1,19 @@
 package madstodolist.controller;
 
+import madstodolist.authentication.ManagerUserSession;
+import madstodolist.controller.exception.EquipoNotFoundException;
+import madstodolist.controller.exception.UsuarioNoAutorizadoException;
+import madstodolist.dto.UsuarioData;
 import madstodolist.model.Equipo;
+import madstodolist.model.Usuario;
 import madstodolist.service.EquipoService;
+import madstodolist.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import madstodolist.controller.exception.EquipoNotFoundException;
-import madstodolist.model.Usuario;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class EquipoController {
@@ -25,8 +21,34 @@ public class EquipoController {
     @Autowired
     private EquipoService equipoService;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private ManagerUserSession managerUserSession;
+
+    private void cargarDatosUsuarioEnModelo(Model model) {
+        Long idUsuarioLogeado = managerUserSession.usuarioLogeado();
+        if (idUsuarioLogeado != null) {
+            UsuarioData usuario = usuarioService.findById(idUsuarioLogeado);
+            model.addAttribute("usuario", usuario);
+            model.addAttribute("esAdmin", usuario != null && Boolean.TRUE.equals(usuario.isAdmin()));
+        } else {
+            model.addAttribute("esAdmin", false);
+        }
+    }
+
+    private void comprobarEsAdmin() {
+        Long idUsuarioLogeado = managerUserSession.usuarioLogeado();
+        UsuarioData usuario = (idUsuarioLogeado != null) ? usuarioService.findById(idUsuarioLogeado) : null;
+        if (usuario == null || !Boolean.TRUE.equals(usuario.isAdmin())) {
+            throw new UsuarioNoAutorizadoException();
+        }
+    }
+
     @GetMapping("/equipos")
     public String listadoEquipos(Model model) {
+        cargarDatosUsuarioEnModelo(model);
         List<Equipo> equipos = equipoService.findAllOrderedByName();
         model.addAttribute("equipos", equipos);
         return "listaEquipos";
@@ -39,14 +61,27 @@ public class EquipoController {
             throw new EquipoNotFoundException();
         }
 
+        cargarDatosUsuarioEnModelo(model);
+
         List<Usuario> usuarios = equipoService.usuariosEquipo(idEquipo);
+        Long idUsuarioLogeado = managerUserSession.usuarioLogeado();
+
         model.addAttribute("equipo", equipo);
         model.addAttribute("usuarios", usuarios);
+        model.addAttribute("idUsuarioLogeado", idUsuarioLogeado);
+
+        boolean esMiembro = false;
+        if (idUsuarioLogeado != null) {
+            esMiembro = usuarios.stream().anyMatch(u -> u.getId().equals(idUsuarioLogeado));
+        }
+        model.addAttribute("esMiembro", esMiembro);
+
         return "detalleEquipo";
     }
 
     @GetMapping("/equipos/nuevo")
-    public String formNuevoEquipo() {
+    public String formNuevoEquipo(Model model) {
+        cargarDatosUsuarioEnModelo(model);
         return "formNuevoEquipo";
     }
 
@@ -72,10 +107,12 @@ public class EquipoController {
 
     @GetMapping("/equipos/{id}/editar")
     public String formEditarEquipo(@PathVariable(value = "id") Long idEquipo, Model model) {
+        comprobarEsAdmin();
         Equipo equipo = equipoService.recuperarEquipo(idEquipo);
         if (equipo == null) {
             throw new EquipoNotFoundException();
         }
+        cargarDatosUsuarioEnModelo(model);
         model.addAttribute("equipo", equipo);
         return "formEditarEquipo";
     }
@@ -83,15 +120,15 @@ public class EquipoController {
     @PostMapping("/equipos/{id}/editar")
     public String modificarEquipo(@PathVariable(value = "id") Long idEquipo,
                                   @RequestParam("nombre") String nombre) {
+        comprobarEsAdmin();
         equipoService.modificarEquipo(idEquipo, nombre);
         return "redirect:/equipos";
     }
 
     @DeleteMapping("/equipos/{id}")
     public String eliminarEquipo(@PathVariable(value = "id") Long idEquipo) {
+        comprobarEsAdmin();
         equipoService.eliminarEquipo(idEquipo);
         return "redirect:/equipos";
     }
-
-
 }

@@ -14,7 +14,7 @@
                 <thead>
                 <tr>
                     <th>Nombre</th>
-                    <th>Acciones</th>
+                    <th th:if="${esAdmin}">Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -22,7 +22,7 @@
                     <td>
                         <a th:href="@{/equipos/{id}(id=${equipo.id})}" th:text="${equipo.nombre}">Nombre</a>
                     </td>
-                    <td>
+                    <td th:if="${esAdmin}">
                         <a class="btn btn-primary btn-sm" th:href="@{/equipos/{id}/editar(id=${equipo.id})}">Editar</a>
                         <button type="button" class="btn btn-danger btn-sm"
                                 th:onclick="'eliminarEquipo(' + ${equipo.id} + ')'">
@@ -49,5 +49,7 @@
         }
     }
 </script>
+
+<div th:replace="fragments :: javascript"></div>
 </body>
 </html>

@@ -16,15 +16,25 @@
                 <thead>
                 <tr>
                     <th>Email</th>
-                    <th>Acciones</th>
+                    <!-- Solo mostramos cabecera de acciones si es admin o si el usuario logueado es miembro -->
+                    <th th:if="${esAdmin or esMiembro}">Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="usuario : ${usuarios}">
-                    <td th:text="${usuario.email}">email@ua</td>
-                    <td>
+                <tr th:each="usuarioMiembro : ${usuarios}">
+                    <td th:text="${usuarioMiembro.email}">email@ua</td>
+                    <td th:if="${esAdmin or esMiembro}">
+                        <!-- Caso 1: Es el propio usuario conectado -> botón 'Salir' -->
                         <button type="button" class="btn btn-danger btn-sm"
-                                th:onclick="'eliminarMiembro(' + ${equipo.id} + ',' + ${usuario.id} + ')'">
+                                th:if="${idUsuarioLogeado != null and idUsuarioLogeado == usuarioMiembro.id}"
+                                th:onclick="'eliminarMiembro(' + ${equipo.id} + ',' + ${usuarioMiembro.id} + ')'">
+                            Salir
+                        </button>
+
+                        <!-- Caso 2: Es administrador y no es él mismo -> botón 'Eliminar' -->
+                        <button type="button" class="btn btn-danger btn-sm"
+                                th:if="${esAdmin and (idUsuarioLogeado == null or idUsuarioLogeado != usuarioMiembro.id)}"
+                                th:onclick="'eliminarMiembro(' + ${equipo.id} + ',' + ${usuarioMiembro.id} + ')'">
                             Eliminar
                         </button>
                     </td>
@@ -32,14 +42,24 @@
                 </tbody>
             </table>
             <p th:if="${#lists.isEmpty(usuarios)}">Este equipo no tiene miembros actualmente.</p>
-            <a class="btn btn-secondary mt-2" th:href="@{/equipos}">Volver al listado</a>
+
+            <div class="mt-3">
+                <!-- Botón para unirse si está autenticado y aún no pertenece al equipo -->
+                <form th:if="${!esMiembro and idUsuarioLogeado != null}"
+                      th:action="@{/equipos/{idEquipo}/usuarios/{idUsuario}(idEquipo=${equipo.id}, idUsuario=${idUsuarioLogeado})}"
+                      method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-success">Unirme al equipo</button>
+                </form>
+
+                <a class="btn btn-secondary" th:href="@{/equipos}">Volver al listado</a>
+            </div>
         </div>
     </div>
 </div>
 
 <script type="text/javascript">
     function eliminarMiembro(idEquipo, idUsuario) {
-        if (confirm('¿Desea eliminar a este usuario del equipo?')) {
+        if (confirm('¿Seguro que deseas eliminar a este usuario del equipo?')) {
             fetch('/equipos/' + idEquipo + '/usuarios/' + idUsuario, {
                 method: 'DELETE'
             }).then(response => {
@@ -50,5 +70,6 @@
         }
     }
 </script>
+
+<div th:replace="fragments :: javascript"></div>
 </body>
-</html>
