@@ -21,5 +21,6 @@ madstodolist/service/TareaService.class
 madstodolist/service/UsuarioService.class
 madstodolist/repository/UsuarioRepository.class
 madstodolist/service/UsuarioService$LoginStatus.class
+madstodolist/model/Equipo.class
 madstodolist/model/Usuario.class
 madstodolist/repository/TareaRepository.class
