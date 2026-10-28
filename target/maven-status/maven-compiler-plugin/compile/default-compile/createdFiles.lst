@@ -8,6 +8,7 @@ madstodolist/Application.class
 madstodolist/controller/exception/UsuarioNotFoundException.class
 madstodolist/controller/exception/TareaNotFoundException.class
 madstodolist/service/TareaServiceException.class
+madstodolist/service/EquipoService.class
 madstodolist/controller/UsuarioController.class
 madstodolist/repository/EquipoRepository.class
 madstodolist/controller/HomeController.class
