@@ -9,6 +9,7 @@ madstodolist/controller/exception/UsuarioNotFoundException.class
 madstodolist/controller/exception/TareaNotFoundException.class
 madstodolist/service/TareaServiceException.class
 madstodolist/controller/UsuarioController.class
+madstodolist/repository/EquipoRepository.class
 madstodolist/controller/HomeController.class
 madstodolist/service/InitDbService.class
 madstodolist/dto/LoginData.class

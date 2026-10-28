@@ -25,6 +25,9 @@ public class Usuario implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date fechaNacimiento;
 
+    @ManyToMany(mappedBy = "usuarios")
+    private Set<Equipo> equipos = new HashSet<>();
+
     private Boolean admin = false;
 
     private Boolean bloqueado = false;
@@ -135,5 +138,15 @@ public class Usuario implements Serializable {
 
     public void setAdmin(Boolean admin) {
         this.admin = admin;
+    }
+
+
+
+    public Set<Equipo> getEquipos() {
+        return equipos;
+    }
+
+    public void setEquipos(Set<Equipo> equipos) {
+        this.equipos = equipos;
     }
 }
