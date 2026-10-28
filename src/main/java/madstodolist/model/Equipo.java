@@ -1,17 +1,56 @@
 package madstodolist.model;
 
-public class Equipo {
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Objects;
+
+@Entity
+@Table(name = "equipos")
+public class Equipo implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String nombre;
 
-    public Equipo(String n){
-        this.nombre = n;
+    public Equipo() {}
+
+    public Equipo(String nombre) {
+        this.nombre = nombre;
     }
 
-    public String getNombre(){
-        return this.nombre;
+    public Long getId() {
+        return id;
     }
 
-    public void setNombre(String n){
-        this.nombre = n;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Equipo equipo = (Equipo) o;
+        if (id != null && equipo.id != null) {
+            return Objects.equals(id, equipo.id);
+        }
+        return Objects.equals(nombre, equipo.nombre);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nombre);
     }
 }
