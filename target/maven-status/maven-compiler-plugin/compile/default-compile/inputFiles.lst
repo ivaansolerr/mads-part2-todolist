@@ -21,6 +21,7 @@
 /home/ivans/Desktop/mads/mads-part2/src/main/java/madstodolist/repository/TareaRepository.java
 /home/ivans/Desktop/mads/mads-part2/src/main/java/madstodolist/dto/RegistroData.java
 /home/ivans/Desktop/mads/mads-part2/src/main/java/madstodolist/Application.java
+/home/ivans/Desktop/mads/mads-part2/src/main/java/madstodolist/service/EquipoService.java
 /home/ivans/Desktop/mads/mads-part2/src/main/java/madstodolist/controller/TareaController.java
 /home/ivans/Desktop/mads/mads-part2/src/main/java/madstodolist/service/TareaService.java
 /home/ivans/Desktop/mads/mads-part2/src/main/java/madstodolist/service/InitDbService.java
