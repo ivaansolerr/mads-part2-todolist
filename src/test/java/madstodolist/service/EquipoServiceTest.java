@@ -126,5 +126,21 @@ public class EquipoServiceTest {
         List<Equipo> equipos = equipoService.equiposUsuario(usuario.getId());
         assertThat(equipos).isEmpty();
     }
+
+    @Test
+    @Transactional
+    public void modificarEquipoCambiaElNombre() {
+        // GIVEN
+        Equipo equipo = equipoService.crearEquipo("Equipo Original");
+
+        // WHEN
+        Equipo equipoModificado = equipoService.modificarEquipo(equipo.getId(), "Equipo Renombrado");
+
+        // THEN
+        assertThat(equipoModificado.getNombre()).isEqualTo("Equipo Renombrado");
+
+        Equipo equipoRecuperado = equipoService.recuperarEquipo(equipo.getId());
+        assertThat(equipoRecuperado.getNombre()).isEqualTo("Equipo Renombrado");
+    }
 }
 

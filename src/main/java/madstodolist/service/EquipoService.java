@@ -88,4 +88,14 @@ public class EquipoService {
         equipo.getUsuarios().remove(usuario);
         usuario.getEquipos().remove(equipo);
     }
+
+    @Transactional
+    public Equipo modificarEquipo(Long idEquipo, String nuevoNombre) {
+        Equipo equipo = equipoRepository.findById(idEquipo).orElse(null);
+        if (equipo == null) {
+            throw new EquipoServiceException("Equipo no encontrado");
+        }
+        equipo.setNombre(nuevoNombre);
+        return equipoRepository.save(equipo);
+    }
 }
