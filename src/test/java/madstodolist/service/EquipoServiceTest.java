@@ -142,5 +142,19 @@ public class EquipoServiceTest {
         Equipo equipoRecuperado = equipoService.recuperarEquipo(equipo.getId());
         assertThat(equipoRecuperado.getNombre()).isEqualTo("Equipo Renombrado");
     }
+
+    @Test
+    @Transactional
+    public void eliminarEquipoLoBorraDeLaBaseDeDatos() {
+        // GIVEN
+        Equipo equipo = equipoService.crearEquipo("Equipo A Borrar");
+
+        // WHEN
+        equipoService.eliminarEquipo(equipo.getId());
+
+        // THEN
+        Equipo equipoRecuperado = equipoService.recuperarEquipo(equipo.getId());
+        assertThat(equipoRecuperado).isNull();
+    }
 }
 
