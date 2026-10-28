@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,5 +42,24 @@ public class EquipoServiceTest {
         assertThat(equipoRecuperado).isNotNull();
         assertThat(equipoRecuperado.getId()).isEqualTo(equipo.getId());
         assertThat(equipoRecuperado.getNombre()).isEqualTo("Proyecto P1");
+    }
+
+
+    @Test
+    @Transactional
+    public void recuperarTodosLosEquiposOrdenadosAlfabeticamente() {
+        // GIVEN
+        equipoService.crearEquipo("Beta");
+        equipoService.crearEquipo("Alfa");
+        equipoService.crearEquipo("Gamma");
+
+        // WHEN
+        List<Equipo> equipos = equipoService.findAllOrderedByName();
+
+        // THEN
+        assertThat(equipos).hasSize(3);
+        assertThat(equipos.get(0).getNombre()).isEqualTo("Alfa");
+        assertThat(equipos.get(1).getNombre()).isEqualTo("Beta");
+        assertThat(equipos.get(2).getNombre()).isEqualTo("Gamma");
     }
 }
