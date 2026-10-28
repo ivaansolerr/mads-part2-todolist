@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
+import madstodolist.controller.exception.EquipoNotFoundException;
+import madstodolist.model.Usuario;
+import org.springframework.web.bind.annotation.PathVariable;
+
 @Controller
 public class EquipoController {
 
@@ -20,5 +24,18 @@ public class EquipoController {
         List<Equipo> equipos = equipoService.findAllOrderedByName();
         model.addAttribute("equipos", equipos);
         return "listaEquipos";
+    }
+
+    @GetMapping("/equipos/{id}")
+    public String detalleEquipo(@PathVariable(value = "id") Long idEquipo, Model model) {
+        Equipo equipo = equipoService.recuperarEquipo(idEquipo);
+        if (equipo == null) {
+            throw new EquipoNotFoundException();
+        }
+
+        List<Usuario> usuarios = equipoService.usuariosEquipo(idEquipo);
+        model.addAttribute("equipo", equipo);
+        model.addAttribute("usuarios", usuarios);
+        return "detalleEquipo";
     }
 }

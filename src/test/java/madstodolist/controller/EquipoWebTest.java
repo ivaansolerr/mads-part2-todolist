@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
+import madstodolist.model.Usuario;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
@@ -44,5 +45,33 @@ public class EquipoWebTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Alfa")))
                 .andExpect(content().string(containsString("Beta")));
+    }
+
+    @Test
+    public void getDetalleEquipoDevuelveNombreYMiembros() throws Exception {
+        // GIVEN
+        Equipo equipo = new Equipo("Proyecto Alfa");
+        Usuario user1 = new Usuario("ana@ua");
+        Usuario user2 = new Usuario("juan@ua");
+
+        when(equipoService.recuperarEquipo(1L)).thenReturn(equipo);
+        when(equipoService.usuariosEquipo(1L)).thenReturn(Arrays.asList(user1, user2));
+
+        // WHEN, THEN
+        this.mockMvc.perform(get("/equipos/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Proyecto Alfa")))
+                .andExpect(content().string(containsString("ana@ua")))
+                .andExpect(content().string(containsString("juan@ua")));
+    }
+
+    @Test
+    public void getDetalleEquipoNoExistenteDevuelve404() throws Exception {
+        // GIVEN
+        when(equipoService.recuperarEquipo(999L)).thenReturn(null);
+
+        // WHEN, THEN
+        this.mockMvc.perform(get("/equipos/999"))
+                .andExpect(status().isNotFound());
     }
 }
