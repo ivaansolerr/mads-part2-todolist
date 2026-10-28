@@ -59,4 +59,15 @@ public class EquipoService {
         usuarios.sort(Comparator.comparing(Usuario::getNombre, Comparator.nullsLast(String::compareTo)));
         return usuarios;
     }
+
+    @Transactional(readOnly = true)
+    public List<Equipo> equiposUsuario(Long idUsuario) {
+        Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
+        if (usuario == null) {
+            return Collections.emptyList();
+        }
+        List<Equipo> equipos = new ArrayList<>(usuario.getEquipos());
+        equipos.sort(Comparator.comparing(Equipo::getNombre, Comparator.nullsLast(String::compareTo)));
+        return equipos;
+    }
 }

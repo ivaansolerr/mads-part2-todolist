@@ -1,6 +1,7 @@
 package madstodolist.service;
 
 import madstodolist.model.Equipo;
+import madstodolist.model.Usuario;
 import madstodolist.repository.UsuarioRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +83,28 @@ public class EquipoServiceTest {
         List<madstodolist.model.Usuario> usuarios = equipoService.usuariosEquipo(equipo.getId());
         assertThat(usuarios).hasSize(1);
         assertThat(usuarios.get(0).getEmail()).isEqualTo("ana.lopez@gmail.com");
+    }
+
+    @Test
+    @Transactional
+    public void equiposDeUnUsuario() {
+        // GIVEN
+        Usuario usuario = new Usuario("ana.lopez@gmail.com");
+        usuarioRepository.save(usuario);
+
+        Equipo equipo1 = equipoService.crearEquipo("Proyecto P1");
+        Equipo equipo2 = equipoService.crearEquipo("Proyecto P2");
+
+        equipoService.anadirUsuarioAEquipo(equipo1.getId(), usuario.getId());
+        equipoService.anadirUsuarioAEquipo(equipo2.getId(), usuario.getId());
+
+        // WHEN
+        List<Equipo> equipos = equipoService.equiposUsuario(usuario.getId());
+
+        // THEN
+        assertThat(equipos).hasSize(2);
+        assertThat(equipos.get(0).getNombre()).isEqualTo("Proyecto P1");
+        assertThat(equipos.get(1).getNombre()).isEqualTo("Proyecto P2");
     }
 }
 
