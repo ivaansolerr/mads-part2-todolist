@@ -106,5 +106,25 @@ public class EquipoServiceTest {
         assertThat(equipos.get(0).getNombre()).isEqualTo("Proyecto P1");
         assertThat(equipos.get(1).getNombre()).isEqualTo("Proyecto P2");
     }
+
+    @Test
+    @Transactional
+    public void eliminarUsuarioDeEquipo() {
+        // GIVEN
+        Equipo equipo = equipoService.crearEquipo("Proyecto P1");
+        Usuario usuario = new Usuario("ana.lopez@gmail.com");
+        usuarioRepository.save(usuario);
+        equipoService.anadirUsuarioAEquipo(equipo.getId(), usuario.getId());
+
+        // WHEN
+        equipoService.eliminarUsuarioDeEquipo(equipo.getId(), usuario.getId());
+
+        // THEN
+        List<Usuario> usuarios = equipoService.usuariosEquipo(equipo.getId());
+        assertThat(usuarios).isEmpty();
+
+        List<Equipo> equipos = equipoService.equiposUsuario(usuario.getId());
+        assertThat(equipos).isEmpty();
+    }
 }
 
