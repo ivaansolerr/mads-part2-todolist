@@ -1,5 +1,6 @@
 package madstodolist.repository;
 
+import madstodolist.model.Equipo;
 import madstodolist.model.Usuario;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class UsuarioTest {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private EquipoRepository equipoRepository;
 
     //
     // Tests modelo Usuario en memoria, sin la conexión con la BD
@@ -170,5 +174,27 @@ public class UsuarioTest {
         // se obtiene el usuario correcto.
 
         assertThat(usuarioBD.getNombre()).isEqualTo("Usuario Ejemplo");
+    }
+
+    @Test
+    @Transactional
+    public void unUsuarioTieneMuchosEquipos() {
+        // GIVEN
+        Usuario usuario = new Usuario("juan.gutierrez@gmail.com");
+        usuarioRepository.save(usuario);
+
+        Equipo equipo1 = new Equipo("Proyecto P1");
+        Equipo equipo2 = new Equipo("Proyecto P2");
+        equipoRepository.save(equipo1);
+        equipoRepository.save(equipo2);
+
+        // WHEN
+        equipo1.addUsuario(usuario);
+        equipo2.addUsuario(usuario);
+
+        // THEN
+        Usuario usuarioDB = usuarioRepository.findById(usuario.getId()).orElse(null);
+        assertThat(usuarioDB).isNotNull();
+        assertThat(usuarioDB.getEquipos()).hasSize(2);
     }
 }
