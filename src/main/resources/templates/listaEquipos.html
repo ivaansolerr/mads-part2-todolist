@@ -14,6 +14,7 @@
                 <thead>
                 <tr>
                     <th>Nombre</th>
+                    <th>Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -21,11 +22,32 @@
                     <td>
                         <a th:href="@{/equipos/{id}(id=${equipo.id})}" th:text="${equipo.nombre}">Nombre</a>
                     </td>
+                    <td>
+                        <a class="btn btn-primary btn-sm" th:href="@{/equipos/{id}/editar(id=${equipo.id})}">Editar</a>
+                        <button type="button" class="btn btn-danger btn-sm"
+                                th:onclick="'eliminarEquipo(' + ${equipo.id} + ')'">
+                            Eliminar
+                        </button>
+                    </td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    function eliminarEquipo(idEquipo) {
+        if (confirm('¿Desea eliminar este equipo?')) {
+            fetch('/equipos/' + idEquipo, {
+                method: 'DELETE'
+            }).then(response => {
+                if (response.ok || response.redirected) {
+                    window.location.reload();
+                }
+            });
+        }
+    }
+</script>
 </body>
 </html>
