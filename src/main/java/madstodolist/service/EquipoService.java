@@ -1,5 +1,6 @@
 package madstodolist.service;
 
+import madstodolist.controller.exception.EquipoServiceException;
 import madstodolist.model.Equipo;
 import madstodolist.repository.EquipoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,5 +70,22 @@ public class EquipoService {
         List<Equipo> equipos = new ArrayList<>(usuario.getEquipos());
         equipos.sort(Comparator.comparing(Equipo::getNombre, Comparator.nullsLast(String::compareTo)));
         return equipos;
+    }
+
+    @Transactional
+    public void eliminarUsuarioDeEquipo(Long idEquipo, Long idUsuario) {
+        Equipo equipo = equipoRepository.findById(idEquipo).orElse(null);
+        if (equipo == null) {
+            throw new EquipoServiceException("Equipo no encontrado");
+        }
+
+        Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
+        if (usuario == null) {
+            throw new EquipoServiceException("Usuario no encontrado");
+        }
+
+        // Eliminamos la relación en ambos lados
+        equipo.getUsuarios().remove(usuario);
+        usuario.getEquipos().remove(equipo);
     }
 }
