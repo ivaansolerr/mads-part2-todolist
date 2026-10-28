@@ -18,6 +18,10 @@ import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -34,17 +38,18 @@ public class EquipoWebTest {
 
     @Test
     public void getEquiposDevuelveListaOrdenada() throws Exception {
-        // GIVEN
-        Equipo equipo1 = new Equipo("Alfa");
-        Equipo equipo2 = new Equipo("Beta");
-        List<Equipo> equipos = Arrays.asList(equipo1, equipo2);
-        when(equipoService.findAllOrderedByName()).thenReturn(equipos);
+        Equipo equipo1 = new Equipo("Proyecto A");
+        equipo1.setId(1L); // <-- Asegúrate de que tenga ID
 
-        // WHEN, THEN
+        Equipo equipo2 = new Equipo("Proyecto B");
+        equipo2.setId(2L); // <-- Asegúrate de que tenga ID
+
+        when(equipoService.findAllOrderedByName()).thenReturn(Arrays.asList(equipo1, equipo2));
+
         this.mockMvc.perform(get("/equipos"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Alfa")))
-                .andExpect(content().string(containsString("Beta")));
+                .andExpect(content().string(containsString("Proyecto A")))
+                .andExpect(content().string(containsString("Proyecto B")));
     }
 
     @Test
