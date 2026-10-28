@@ -18,4 +18,9 @@ public class EquipoService {
         equipoRepository.save(equipo);
         return equipo;
     }
+
+    @Transactional(readOnly = true)
+    public Equipo recuperarEquipo(Long id) {
+        return equipoRepository.findById(id).orElse(null);
+    }
 }

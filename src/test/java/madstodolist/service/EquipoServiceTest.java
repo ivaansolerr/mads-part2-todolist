@@ -27,4 +27,19 @@ public class EquipoServiceTest {
         assertThat(equipo.getId()).isNotNull();
         assertThat(equipo.getNombre()).isEqualTo("Proyecto P1");
     }
+
+    @Test
+    @Transactional
+    public void recuperarEquipoPorId() {
+        // GIVEN
+        Equipo equipo = equipoService.crearEquipo("Proyecto P1");
+
+        // WHEN
+        Equipo equipoRecuperado = equipoService.recuperarEquipo(equipo.getId());
+
+        // THEN
+        assertThat(equipoRecuperado).isNotNull();
+        assertThat(equipoRecuperado.getId()).isEqualTo(equipo.getId());
+        assertThat(equipoRecuperado.getNombre()).isEqualTo("Proyecto P1");
+    }
 }
