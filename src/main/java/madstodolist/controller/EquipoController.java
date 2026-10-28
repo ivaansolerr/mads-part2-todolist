@@ -69,4 +69,29 @@ public class EquipoController {
         equipoService.eliminarUsuarioDeEquipo(idEquipo, idUsuario);
         return "redirect:/equipos/" + idEquipo;
     }
+
+    @GetMapping("/equipos/{id}/editar")
+    public String formEditarEquipo(@PathVariable(value = "id") Long idEquipo, Model model) {
+        Equipo equipo = equipoService.recuperarEquipo(idEquipo);
+        if (equipo == null) {
+            throw new EquipoNotFoundException();
+        }
+        model.addAttribute("equipo", equipo);
+        return "formEditarEquipo";
+    }
+
+    @PostMapping("/equipos/{id}/editar")
+    public String modificarEquipo(@PathVariable(value = "id") Long idEquipo,
+                                  @RequestParam("nombre") String nombre) {
+        equipoService.modificarEquipo(idEquipo, nombre);
+        return "redirect:/equipos";
+    }
+
+    @DeleteMapping("/equipos/{id}")
+    public String eliminarEquipo(@PathVariable(value = "id") Long idEquipo) {
+        equipoService.eliminarEquipo(idEquipo);
+        return "redirect:/equipos";
+    }
+
+
 }

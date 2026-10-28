@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import java.util.Arrays;
 import java.util.List;
@@ -121,5 +122,36 @@ public class EquipoWebTest {
                 .andExpect(redirectedUrl("/equipos/1"));
 
         verify(equipoService).eliminarUsuarioDeEquipo(1L, 2L);
+    }
+
+    @Test
+    public void getFormEditarEquipoDevuelveVista() throws Exception {
+        Equipo equipo = new Equipo("Proyecto X");
+        equipo.setId(1L);
+        when(equipoService.recuperarEquipo(1L)).thenReturn(equipo);
+
+        this.mockMvc.perform(get("/equipos/1/editar"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Editar equipo")))
+                .andExpect(content().string(containsString("Proyecto X")));
+    }
+
+    @Test
+    public void postActualizarEquipoModificaYRedirige() throws Exception {
+        this.mockMvc.perform(post("/equipos/1/editar")
+                        .param("nombre", "Proyecto Modificado"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/equipos"));
+
+        verify(equipoService).modificarEquipo(1L, "Proyecto Modificado");
+    }
+
+    @Test
+    public void deleteEliminarEquipoRedirigeAListado() throws Exception {
+        this.mockMvc.perform(delete("/equipos/1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/equipos"));
+
+        verify(equipoService).eliminarEquipo(1L);
     }
 }
