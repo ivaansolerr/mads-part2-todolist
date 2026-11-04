@@ -2,16 +2,17 @@ package madstodolist.service;
 
 import madstodolist.controller.exception.EquipoServiceException;
 import madstodolist.model.Equipo;
+import madstodolist.model.Usuario;
 import madstodolist.repository.EquipoRepository;
+import madstodolist.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import madstodolist.model.Usuario;
-import madstodolist.repository.UsuarioRepository;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 @Service
 public class EquipoService {
@@ -34,7 +35,6 @@ public class EquipoService {
         return equipoRepository.findById(id).orElse(null);
     }
 
-    // Dentro de EquipoService:
     @Transactional(readOnly = true)
     public List<Equipo> findAllOrderedByName() {
         return equipoRepository.findAllOrderedByName();
@@ -84,9 +84,15 @@ public class EquipoService {
             throw new EquipoServiceException("Usuario no encontrado");
         }
 
-        // Eliminamos la relación en ambos lados
-        equipo.getUsuarios().remove(usuario);
-        usuario.getEquipos().remove(equipo);
+        // Eliminamos la relación de forma segura mediante los IDs
+        if (equipo.getUsuarios() != null) {
+            equipo.getUsuarios().removeIf(u -> u != null && idUsuario.equals(u.getId()));
+        }
+        if (usuario.getEquipos() != null) {
+            usuario.getEquipos().removeIf(e -> e != null && idEquipo.equals(e.getId()));
+        }
+
+        equipoRepository.save(equipo);
     }
 
     @Transactional
