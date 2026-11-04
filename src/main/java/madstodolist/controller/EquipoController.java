@@ -100,15 +100,15 @@ public class EquipoController {
     public String eliminarUsuarioDeEquipo(@PathVariable(value = "idEquipo") Long idEquipo,
                                           @PathVariable(value = "idUsuario") Long idUsuario) {
         equipoService.eliminarUsuarioDeEquipo(idEquipo, idUsuario);
-        return "redirect:/equipos";
+        return "redirect:/equipos/" + idEquipo;
     }
 
-    // Endpoint POST para la interacción web desde el navegador
+    // Endpoint POST para la interacción web desde el formulario HTML
     @PostMapping("/equipos/{idEquipo}/usuarios/{idUsuario}/eliminar")
     public String eliminarUsuarioDeEquipoPost(@PathVariable(value = "idEquipo") Long idEquipo,
                                               @PathVariable(value = "idUsuario") Long idUsuario) {
         equipoService.eliminarUsuarioDeEquipo(idEquipo, idUsuario);
-        return "redirect:/equipos";
+        return "redirect:/equipos/" + idEquipo;
     }
 
     @GetMapping("/equipos/{id}/editar")

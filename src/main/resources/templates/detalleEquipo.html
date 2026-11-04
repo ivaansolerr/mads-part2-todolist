@@ -47,6 +47,7 @@
             <p th:if="${usuarios == null or #lists.isEmpty(usuarios)}">Este equipo no tiene miembros actualmente.</p>
 
             <div class="mt-3">
+                <!-- Botón para unirse al equipo si está autenticado y no es miembro -->
                 <form th:if="${!esMiembro and idUsuarioLogeado != null and equipo != null}"
                       th:action="@{/equipos/{idEquipo}/usuarios/{idUsuario}(idEquipo=${equipo.id}, idUsuario=${idUsuarioLogeado})}"
                       method="post" style="display: inline;">
